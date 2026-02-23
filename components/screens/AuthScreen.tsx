@@ -96,53 +96,11 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
         }
     } catch (err: any) {
         console.error("Auth Error", err);
-        // Fallback to LocalStorage Logic if API fails (e.g. Local Mode)
-        // This ensures the user can still test locally without running the backend
-        if (err.message && (err.message.includes('Failed to fetch') || err.message.includes('404') || err.message.includes('502') || err.message.includes('503') || err.message.includes('504'))) {
-            console.warn("Backend offline, using local fallback");
-            
-            // Simulate successful login/register locally
-            const localUser: User = {
-                username: username,
-                balance: 0,
-                bonusBalance: 0,
-                isVip: false,
-                vipExpiry: 0,
-                dailyBonusClaims: 0,
-                boxTracker: { count: 0, totalSpent: 0 },
-                transactions: [],
-                rollover: { current: 0, target: 0 },
-                lastDailyBonus: 0,
-                consecutiveFreeClaims: 0,
-                totalDeposited: 0,
-                inventory: { shields: 0, magnets: 0, extraLives: 0 },
-                referrals: [],
-                invitedBy: undefined,
-                affiliateEarnings: { cpa: 0, revShare: 0 }
-            };
-
-            // Check if user already exists in local storage to preserve balance
-            const existingData = localStorage.getItem(`snakebet_data_${username}`);
-            if (existingData) {
-                const parsed = JSON.parse(existingData);
-                localUser.balance = parsed.balance || 0;
-                localUser.bonusBalance = parsed.bonusBalance || 0;
-                // ... restore other fields if needed
-            }
-
-            localStorage.setItem('snakebet_token', 'local_token_' + Date.now());
-            localStorage.setItem('snakebet_last_user', username);
-            onLogin(localUser);
-            return;
-        }
-        
         // Handle actual API errors (e.g. 401, 403)
-        {
-             // Try to extract the most meaningful error message
-             const errorMessage = err.error || err.message || err.msg || "Erro ao autenticar. Verifique seus dados.";
-             setError(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
-             setLoading(false);
-        }
+        // Try to extract the most meaningful error message
+        const errorMessage = err.error || err.message || err.msg || "Erro ao autenticar. Verifique seus dados.";
+        setError(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
+        setLoading(false);
     }
   };
 
